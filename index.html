@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Web Fundamentals Quiz: HTML, CSS & the Internet</title>
+<style>
+  :root{
+    --ink:#151821;
+    --paper:#f4f5f7;
+    --accent:#2f5fd6;
+    --accent-soft:#e6ecfb;
+    --line:#dde1e8;
+    --good:#1f7a45;
+    --bad:#c23b3b;
+    --card:#ffffff;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    padding:2rem 1rem 5rem;
+  }
+  .wrap{max-width:760px;margin:0 auto;}
+  header{margin-bottom:2rem;text-align:center;}
+  h1{
+    font-size:1.7rem;
+    margin:0 0 .3rem;
+    letter-spacing:-.01em;
+  }
+  header p{color:#5a6072;font-size:.95rem;margin:0;}
+  .progress-bar{
+    height:6px;background:var(--line);border-radius:4px;overflow:hidden;
+    margin:1.5rem 0 0;
+  }
+  .progress-fill{
+    height:100%;background:var(--accent);width:0%;
+    transition:width .3s ease;
+  }
+  .progress-label{
+    font-size:.8rem;color:#5a6072;
+    text-align:right;margin-top:.3rem;
+  }
+  .section-divider{
+    margin:2rem 0 1rem;
+    font-size:.85rem;
+    font-weight:600;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    color:var(--accent);
+    border-bottom:2px solid var(--accent-soft);
+    padding-bottom:.4rem;
+  }
+  .question-card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:1.4rem 1.4rem 1.2rem;
+    margin-bottom:1.1rem;
+  }
+  .q-tag{
+    display:inline-block;
+    font-size:.68rem;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    color:var(--accent);
+    background:var(--accent-soft);
+    padding:.15rem .55rem;
+    border-radius:20px;
+    margin-bottom:.6rem;
+    font-weight:600;
+  }
+  .q-text{font-size:1rem;line-height:1.45;margin:0 0 .9rem;font-weight:500;}
+  .options{display:flex;flex-direction:column;gap:.5rem;}
+  .option{
+    display:flex;align-items:flex-start;gap:.6rem;
+    padding:.6rem .7rem;
+    border:1px solid var(--line);
+    border-radius:7px;
+    cursor:pointer;
+    font-size:.92rem;
+    transition:border-color .15s, background .15s;
+  }
+  .option:hover{border-color:var(--accent);}
+  .option input{margin-top:.2rem;accent-color:var(--accent);flex-shrink:0;}
+  .option.selected{
+    border-color:var(--accent);
+    background:var(--accent-soft);
+  }
+  .option.correct-answer{
+    border-color:var(--good);
+    background:#e6f5ec;
+  }
+  .option.wrong-answer{
+    border-color:var(--bad);
+    background:#fbeaea;
+  }
+  .mark{
+    font-weight:600;
+    margin-left:auto;
+    font-size:.8rem;
+    white-space:nowrap;
+  }
+  .mark.good{color:var(--good);}
+  .mark.bad{color:var(--bad);}
+
+  .submit-row{text-align:center;margin-top:1.8rem;}
+  button{
+    font-family:inherit;
+    background:var(--accent);
+    color:#fff;
+    border:none;
+    padding:.8rem 2.2rem;
+    font-size:1rem;
+    border-radius:30px;
+    cursor:pointer;
+  }
+  button:hover{background:#2450b5;}
+  button:disabled{background:#a8b4cc;cursor:not-allowed;}
+  button.secondary{
+    background:transparent;
+    color:var(--accent);
+    border:1px solid var(--accent);
+    margin-right:.5rem;
+  }
+  button.secondary:hover{background:var(--accent-soft);}
+
+  .unanswered-note{
+    text-align:center;color:var(--bad);font-size:.85rem;margin-top:.6rem;
+  }
+
+  #results{display:none;text-align:center;}
+  .score-circle{
+    width:150px;height:150px;border-radius:50%;
+    border:8px solid var(--accent);
+    margin:1.5rem auto;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+  }
+  .score-circle .num{font-size:2.2rem;font-weight:700;color:var(--ink);}
+  .score-circle .den{font-size:.9rem;color:#5a6072;}
+  #results .verdict{font-size:1.2rem;margin-bottom:.2rem;font-weight:600;}
+  #results .breakdown{
+    color:#5a6072;font-size:.9rem;margin-bottom:1.5rem;line-height:1.6;
+  }
+  .hidden{display:none !important;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Web Fundamentals Quiz</h1>
+    <p>70 questions on HTML, CSS, and Internet Basics</p>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="progress-label" id="progressLabel">0 / 70 answered</div>
+  </header>
+
+  <div id="quizForm"></div>
+
+  <div class="submit-row" id="submitRow">
+    <button id="submitBtn">Submit Quiz</button>
+    <div class="unanswered-note hidden" id="unansweredNote"></div>
+  </div>
+
+  <div id="results">
+    <div class="verdict" id="verdictText"></div>
+    <div class="score-circle">
+      <div class="num" id="scoreNum">0</div>
+      <div class="den">out of 70</div>
+    </div>
+    <div class="breakdown" id="breakdownText"></div>
+    <button class="secondary" id="reviewBtn">Review Answers</button>
+    <button id="retryBtn">Retake Quiz</button>
+  </div>
+</div>
+
+<script>
+const questions = [
+  // ---- HTML (18) ----
+  {cat:"HTML", q:"What does HTML stand for?", options:["Hyper Trainer Marking Language","Hyper Text Markup Language","Home Tool Markup Language","High-level Text Modeling Language"], answer:1},
+  {cat:"HTML", q:"Which element defines the metadata (title, charset, links) not shown directly on the page?", options:["<meta>","<body>","<head>","<info>"], answer:2},
+  {cat:"HTML", q:"Which attribute makes a form field mandatory before submission?", options:["needed","required","mandatory","validate"], answer:1},
+  {cat:"HTML", q:"Which semantic element represents a self-contained piece of content, like a blog post, that could stand alone?", options:["<div>","<section>","<article>","<content>"], answer:2},
+  {cat:"HTML", q:"What is the correct way to reference a CSS file inside <head>?", options:["<style src='styles.css'>","<link rel='stylesheet' href='styles.css'>","<css href='styles.css'>","<script src='styles.css'>"], answer:1},
+  {cat:"HTML", q:"Which attribute is used to specify a keyboard shortcut for an element?", options:["shortcut","accesskey","hotkey","tabindex"], answer:1},
+  {cat:"HTML", q:"Which tag defines a dropdown selection list?", options:["<select>","<dropdown>","<option>","<list>"], answer:0},
+  {cat:"HTML", q:"What does the 'srcset' attribute on an <img> allow?", options:["Setting multiple alt texts","Providing different image sources for different screen sizes/resolutions","Linking multiple stylesheets","Defining a fallback video source"], answer:1},
+  {cat:"HTML", q:"Which element is used to embed a scalable vector graphic directly in HTML?", options:["<canvas>","<svg>","<img>","<vector>"], answer:1},
+  {cat:"HTML", q:"What is the purpose of the 'lang' attribute on the <html> tag?", options:["Sets the page's programming language","Declares the natural language of the page's content","Sets the character encoding","Defines the layout direction only"], answer:1},
+  {cat:"HTML", q:"Which input type restricts entry to a valid email address format?", options:["type='mail'","type='text'","type='email'","type='address'"], answer:2},
+  {cat:"HTML", q:"Which tag groups a set of related form controls with a caption?", options:["<fieldset>","<group>","<formgroup>","<optgroup>"], answer:0},
+  {cat:"HTML", q:"What does the 'defer' attribute on a <script> tag do?", options:["Deletes the script after use","Loads the script but delays execution until after the HTML is parsed","Runs the script before HTML parsing","Prevents the script from ever running"], answer:1},
+  {cat:"HTML", q:"Which element is the correct container for navigation links across a site?", options:["<links>","<nav>","<menu>","<navbar>"], answer:1},
+  {cat:"HTML", q:"What is the main difference between <div> and <span>?", options:["<div> is inline, <span> is block-level","<div> is block-level, <span> is inline","They are functionally identical","<span> can only hold text"], answer:1},
+  {cat:"HTML", q:"Which attribute helps assistive technologies understand the purpose of an interactive element?", options:["title","aria-label","alt","data-label"], answer:1},
+  {cat:"HTML", q:"Which tag is used to define preformatted text that preserves whitespace and line breaks?", options:["<pre>","<code>","<format>","<raw>"], answer:0},
+  {cat:"HTML", q:"What is the purpose of the 'viewport' meta tag?", options:["Loads external fonts","Controls how a page is scaled and displayed on different devices","Sets the page's default language","Defines the page's color scheme"], answer:1},
+  {cat:"HTML", q:"Which tag is used to embed a webpage within another webpage?", options:["<embed>","<iframe>","<frame>","<window>"], answer:1},
+  {cat:"HTML", q:"Which element represents a scalar value within a known range, like a progress indicator?", options:["<progress>","<range>","<meter>","<gauge>"], answer:0},
+  {cat:"HTML", q:"Which attribute on an <a> tag opens the link in a new browser tab?", options:["target='_new'","target='_blank'","new='tab'","open='newtab'"], answer:1},
+  {cat:"HTML", q:"Which tag is used to define a table header cell?", options:["<td>","<th>","<head>","<thead>"], answer:1},
+  {cat:"HTML", q:"What is the correct way to add a tooltip that appears on hover for any element?", options:["Using the 'tooltip' attribute","Using the 'title' attribute","Using the 'hover' attribute","Using the 'alt' attribute"], answer:1},
+  {cat:"HTML", q:"Which HTML5 element is used to draw graphics via JavaScript?", options:["<draw>","<graphic>","<canvas>","<svg>"], answer:2},
+
+  // ---- CSS (18) ----
+  {cat:"CSS", q:"What does CSS stand for?", options:["Creative Style Sheets","Cascading Style Sheets","Computer Style Syntax","Colorful Style Sheets"], answer:1},
+  {cat:"CSS", q:"In the CSS box model, what is the correct order from innermost to outermost?", options:["Content, Border, Padding, Margin","Content, Padding, Border, Margin","Padding, Content, Border, Margin","Margin, Border, Padding, Content"], answer:1},
+  {cat:"CSS", q:"Which CSS specificity rule generally applies when two selectors have equal specificity?", options:["The shorter selector wins","The one defined first wins","The one that appears later in the stylesheet wins","Neither rule is applied"], answer:2},
+  {cat:"CSS", q:"Which property controls the space between flex or grid items?", options:["margin","gap","spacing","gutter"], answer:1},
+  {cat:"CSS", q:"What does 'em' represent as a CSS unit?", options:["A fixed pixel value","Relative to the root element's font size","Relative to the current element's font size","A percentage of the viewport width"], answer:2},
+  {cat:"CSS", q:"What does 'rem' represent as a CSS unit?", options:["Relative to the parent element","Relative to the root (html) element's font size","A fixed unit equal to 16px always","Relative to the viewport height"], answer:1},
+  {cat:"CSS", q:"Which pseudo-class targets an element when the mouse pointer is over it?", options:[":focus",":active",":hover",":visited"], answer:2},
+  {cat:"CSS", q:"Which CSS Grid property defines the number and size of columns?", options:["grid-template-columns","grid-columns","column-template","grid-column-count"], answer:0},
+  {cat:"CSS", q:"What does 'z-index' control?", options:["The horizontal position of an element","The stacking order of overlapping elements","The zoom level of the page","The transparency of an element"], answer:1},
+  {cat:"CSS", q:"Which value of 'position' keeps an element fixed relative to the viewport, even when scrolling?", options:["relative","absolute","fixed","sticky"], answer:2},
+  {cat:"CSS", q:"What is the purpose of a CSS preprocessor like Sass?", options:["To replace HTML entirely","To add features like variables, nesting, and mixins that compile to plain CSS","To run JavaScript inside CSS","To convert CSS into HTML"], answer:1},
+  {cat:"CSS", q:"Which property is used to create smooth animations between CSS states triggered by a change (like hover)?", options:["animation","transform","transition","keyframes"], answer:2},
+  {cat:"CSS", q:"In Flexbox, which property controls how items wrap onto multiple lines?", options:["flex-wrap","flex-direction","flex-flow","wrap-content"], answer:0},
+  {cat:"CSS", q:"What does 'box-sizing: border-box' change?", options:["It removes borders entirely","It includes padding and border within the element's declared width/height","It makes the element circular","It disables the box model"], answer:1},
+  {cat:"CSS", q:"Which selector targets only direct children of an element, not all descendants?", options:["Descendant selector (space)","Child selector (>)","Sibling selector (+)","Universal selector (*)"], answer:1},
+  {cat:"CSS", q:"What is the primary purpose of a CSS media query?", options:["To load external media files","To apply styles conditionally based on device characteristics like screen width","To embed video content","To query a database for content"], answer:1},
+  {cat:"CSS", q:"Which CSS custom property (variable) syntax is correct?", options:["--main-color: blue;","$main-color: blue;","@main-color: blue;","var-main-color: blue;"], answer:0},
+  {cat:"CSS", q:"What does 'object-fit: cover' do to an image inside a container?", options:["Stretches the image to fill, distorting proportions","Scales the image to fill the container while maintaining aspect ratio, cropping if necessary","Shrinks the image to fit entirely inside without cropping","Hides the image"], answer:1},
+  {cat:"CSS", q:"Which property is used to change the font family of text?", options:["font-family","text-family","font-type","letter-style"], answer:0},
+  {cat:"CSS", q:"Which pseudo-class targets the first child element of its parent?", options:[":first",":first-child",":child-first",":nth(1)"], answer:1},
+  {cat:"CSS", q:"What does 'flex-direction: column' do in a flex container?", options:["Arranges items horizontally, left to right","Arranges items vertically, top to bottom","Reverses the item order only","Hides overflowing items"], answer:1},
+  {cat:"CSS", q:"Which property controls the horizontal alignment of inline or inline-block content within its container?", options:["text-align","align-content","justify-self","vertical-align"], answer:0},
+  {cat:"CSS", q:"What is the effect of 'display: none' on an element?", options:["It hides the element visually but still takes up space","It removes the element entirely from the page layout, as if it doesn't exist","It makes the element transparent only","It disables user interaction but keeps it visible"], answer:1},
+  {cat:"CSS", q:"Which CSS property is used to control the stacking direction of grid rows and columns simultaneously?", options:["grid-template-areas","grid-auto-flow","grid-direction","grid-order"], answer:1},
+
+  // ---- Internet & Web Basics (17, beginner level) ----
+  {cat:"Internet", q:"What does 'www' stand for?", options:["World Wide Web","World Web Wide","Wide World Web","Web World Wide"], answer:0},
+  {cat:"Internet", q:"What do you call the software you use to visit websites, like Chrome or Safari?", options:["A server","A browser","A domain","A router"], answer:1},
+  {cat:"Internet", q:"What is a website's address, like www.example.com, called?", options:["A URL","A CPU","An HTML tag","A file"], answer:0},
+  {cat:"Internet", q:"What does 'HTTP' relate to?", options:["A type of image file","The way web pages are sent over the internet","A programming language","A brand of computer"], answer:1},
+  {cat:"Internet", q:"What does the padlock icon in a browser's address bar usually mean?", options:["The page is broken","The connection is secure (HTTPS)","The page is loading slowly","The site is offline"], answer:1},
+  {cat:"Internet", q:"What is the internet, in simple terms?", options:["A single giant computer","A global network connecting millions of computers so they can share information","A type of website","A social media app"], answer:1},
+  {cat:"Internet", q:"What is a 'web page'?", options:["A physical page in a printed book","A single document you can view in a web browser","A type of computer virus","A brand of laptop"], answer:1},
+  {cat:"Internet", q:"What is a 'website'?", options:["A single image on the internet","A collection of related web pages found at one address","A type of email","A computer's operating system"], answer:1},
+  {cat:"Internet", q:"What do you call clicking on text or an image that takes you to another page?", options:["A refresh","A hyperlink (link)","A download","A cookie"], answer:1},
+  {cat:"Internet", q:"What does Wi-Fi allow you to do?", options:["Connect to the internet wirelessly","Print documents automatically","Charge your phone faster","Block unwanted emails"], answer:0},
+  {cat:"Internet", q:"What is an example of a search engine?", options:["Microsoft Word","Google","Photoshop","Windows"], answer:1},
+  {cat:"Internet", q:"What does 'downloading' a file mean?", options:["Sending a file from your device to another device","Copying a file from the internet onto your own device","Deleting a file","Printing a file"], answer:1},
+  {cat:"Internet", q:"What is 'uploading'?", options:["Sending a file from your device to the internet or another device","Turning off your computer","Restarting a web page","Deleting your browser history"], answer:0},
+  {cat:"Internet", q:"What is an email address used for?", options:["Browsing websites faster","Sending and receiving digital messages","Storing photos only","Connecting a printer"], answer:1},
+  {cat:"Internet", q:"What does it mean if a website is 'down'?", options:["It has a very simple design","It is temporarily unavailable or not working","It only works on mobile phones","It has too many colors"], answer:1},
+  {cat:"Internet", q:"What is a Wi-Fi password used for?", options:["Logging into a website","Securing access to a wireless internet connection","Unlocking a laptop screen","Opening an email"], answer:1},
+  {cat:"Internet", q:"Why do websites sometimes ask you to accept 'cookies'?", options:["To offer you an actual snack","To let the site remember information about your visit, like preferences or login status","To speed up your internet connection","To block viruses"], answer:1},
+  {cat:"Internet", q:"What is a username typically used with?", options:["A password, to log into an account","A printer, to start printing","A Wi-Fi router, to reset it","A browser, to change its color"], answer:0},
+  {cat:"Internet", q:"What does it mean to 'refresh' a web page?", options:["Delete the page permanently","Reload the page to see the most current version","Save the page to your computer","Close the browser"], answer:1},
+  {cat:"Internet", q:"What is the purpose of a search bar on a website?", options:["To change the website's language","To let users find specific content quickly","To log users out","To adjust screen brightness"], answer:1},
+  {cat:"Internet", q:"What does 'online' mean?", options:["Being connected to the internet","Having your computer turned off","Using a printer","Deleting your files"], answer:0},
+  {cat:"Internet", q:"What is a 'pop-up' on a website?", options:["A hidden file on your computer","A small window that suddenly appears on top of the page content","A type of internet cable","A kind of computer virus that cannot be closed"], answer:1}
+];
+
+const categoryOrder = ["HTML", "CSS", "Internet"];
+const categoryLabels = {
+  "HTML": "Part 1 · HTML Fundamentals",
+  "CSS": "Part 2 · CSS Fundamentals",
+  "Internet": "Part 3 · Internet Basics (Beginner Level)"
+};
+
+const form = document.getElementById('quizForm');
+const progressFill = document.getElementById('progressFill');
+const progressLabel = document.getElementById('progressLabel');
+const submitBtn = document.getElementById('submitBtn');
+const unansweredNote = document.getElementById('unansweredNote');
+const submitRow = document.getElementById('submitRow');
+const resultsDiv = document.getElementById('results');
+const scoreNum = document.getElementById('scoreNum');
+const verdictText = document.getElementById('verdictText');
+const breakdownText = document.getElementById('breakdownText');
+const reviewBtn = document.getElementById('reviewBtn');
+const retryBtn = document.getElementById('retryBtn');
+
+let userAnswers = new Array(questions.length).fill(null);
+let submitted = false;
+
+function renderQuiz(){
+  form.innerHTML = '';
+  let lastCat = null;
+  questions.forEach((item, qi) => {
+    if(item.cat !== lastCat){
+      const divider = document.createElement('div');
+      divider.className = 'section-divider';
+      divider.textContent = categoryLabels[item.cat];
+      form.appendChild(divider);
+      lastCat = item.cat;
+    }
+
+    const card = document.createElement('div');
+    card.className = 'question-card';
+    card.id = 'card-' + qi;
+
+    const tag = document.createElement('span');
+    tag.className = 'q-tag';
+    tag.textContent = item.cat + ' · Q' + (qi+1);
+    card.appendChild(tag);
+
+    const qText = document.createElement('p');
+    qText.className = 'q-text';
+    qText.textContent = item.q;
+    card.appendChild(qText);
+
+    const optsWrap = document.createElement('div');
+    optsWrap.className = 'options';
+
+    item.options.forEach((opt, oi) => {
+      const label = document.createElement('label');
+      label.className = 'option';
+      label.id = 'opt-' + qi + '-' + oi;
+
+      const input = document.createElement('input');
+      input.type = 'radio';
+      input.name = 'q' + qi;
+      input.value = oi;
+      input.addEventListener('change', () => selectAnswer(qi, oi));
+
+      const span = document.createElement('span');
+      span.textContent = opt;
+
+      label.appendChild(input);
+      label.appendChild(span);
+      optsWrap.appendChild(label);
+    });
+
+    card.appendChild(optsWrap);
+    form.appendChild(card);
+  });
+}
+
+function selectAnswer(qi, oi){
+  if(submitted) return;
+  userAnswers[qi] = oi;
+  document.querySelectorAll('#card-' + qi + ' .option').forEach(el => el.classList.remove('selected'));
+  document.getElementById('opt-' + qi + '-' + oi).classList.add('selected');
+  updateProgress();
+}
+
+function updateProgress(){
+  const answered = userAnswers.filter(a => a !== null).length;
+  progressFill.style.width = (answered / questions.length * 100) + '%';
+  progressLabel.textContent = answered + ' / ' + questions.length + ' answered';
+}
+
+function computeScore(){
+  const byCategory = {};
+  categoryOrder.forEach(c => byCategory[c] = {correct:0, total:0});
+  let score = 0;
+  questions.forEach((item, qi) => {
+    byCategory[item.cat].total++;
+    if(userAnswers[qi] === item.answer){
+      score++;
+      byCategory[item.cat].correct++;
+    }
+  });
+  return {score, byCategory};
+}
+
+function showReview(){
+  questions.forEach((item, qi) => {
+    item.options.forEach((opt, oi) => {
+      const optEl = document.getElementById('opt-' + qi + '-' + oi);
+      const input = optEl.querySelector('input');
+      input.disabled = true;
+      optEl.classList.remove('selected');
+      optEl.querySelector('.mark')?.remove();
+
+      if(oi === item.answer){
+        optEl.classList.add('correct-answer');
+        const m = document.createElement('span');
+        m.className = 'mark good';
+        m.textContent = '✓ Correct';
+        optEl.appendChild(m);
+      } else if(oi === userAnswers[qi] && userAnswers[qi] !== item.answer){
+        optEl.classList.add('wrong-answer');
+        const m = document.createElement('span');
+        m.className = 'mark bad';
+        m.textContent = '✗ Your answer';
+        optEl.appendChild(m);
+      }
+    });
+  });
+}
+
+submitBtn.addEventListener('click', () => {
+  const unanswered = userAnswers.filter(a => a === null).length;
+  if(unanswered > 0){
+    unansweredNote.classList.remove('hidden');
+    unansweredNote.textContent = `Please answer every question before submitting. (${unanswered} remaining)`;
+    const firstUnanswered = userAnswers.findIndex(a => a === null);
+    document.getElementById('card-' + firstUnanswered).scrollIntoView({behavior:'smooth', block:'center'});
+    return;
+  }
+  submitted = true;
+  unansweredNote.classList.add('hidden');
+  submitRow.classList.add('hidden');
+
+  const {score, byCategory} = computeScore();
+  showReview();
+
+  scoreNum.textContent = score;
+  const pct = Math.round(score / questions.length * 100);
+  let verdict;
+  if(pct >= 90) verdict = "Outstanding mastery of the fundamentals.";
+  else if(pct >= 75) verdict = "Strong grasp of the material.";
+  else if(pct >= 50) verdict = "Solid foundation — some gaps to close.";
+  else verdict = "Worth revisiting the fundamentals.";
+  verdictText.textContent = verdict + ` (${pct}%)`;
+
+  breakdownText.innerHTML = categoryOrder.map(c =>
+    `${categoryLabels[c].split('· ')[1]}: ${byCategory[c].correct}/${byCategory[c].total}`
+  ).join('<br>');
+
+  resultsDiv.style.display = 'block';
+  resultsDiv.scrollIntoView({behavior:'smooth'});
+});
+
+reviewBtn.addEventListener('click', () => {
+  form.scrollIntoView({behavior:'smooth'});
+});
+
+retryBtn.addEventListener('click', () => {
+  userAnswers = new Array(questions.length).fill(null);
+  submitted = false;
+  resultsDiv.style.display = 'none';
+  submitRow.classList.remove('hidden');
+  renderQuiz();
+  updateProgress();
+  window.scrollTo({top:0, behavior:'smooth'});
+});
+
+renderQuiz();
+updateProgress();
+</script>
+</body>
+</html>
